@@ -1,6 +1,55 @@
-const message='Olá! Analisei a proposta comercial de marketing para a PHOS Energia e gostaria de conversar sobre os detalhes e os próximos passos.';
-const whatsapp='https://wa.me/5561994624993?text='+encodeURIComponent(message);
-function wireLinks(){document.querySelectorAll('a.wa').forEach(a=>{a.href=whatsapp;a.target='_blank';a.rel='noopener noreferrer';});}
-const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('nav');menu.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.classList.toggle('open',open);});nav.addEventListener('click',e=>{if(e.target.closest('a')){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');}});document.addEventListener('keydown',e=>{if(e.key==='Escape'){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');}});
-document.querySelector('#print-link').addEventListener('click',e=>{e.preventDefault();window.print();});let detailStates=[];window.addEventListener('beforeprint',()=>{detailStates=[...document.querySelectorAll('details')].map(d=>[d,d.open]);detailStates.forEach(([d])=>d.open=true);});window.addEventListener('afterprint',()=>detailStates.forEach(([d,open])=>d.open=open));wireLinks();
-const navLinks=[...nav.querySelectorAll('a')];const sectionObserver=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){navLinks.forEach(a=>{const active=a.hash==='#'+entry.target.id;a.classList.toggle('active',active);if(active)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});}});},{rootMargin:'-15% 0px -65% 0px',threshold:0});navLinks.forEach(a=>{const section=document.querySelector(a.hash);if(section)sectionObserver.observe(section);});
+const message = 'Olá! Analisei a proposta comercial de marketing para a PHOS Energia e gostaria de conversar sobre os detalhes e os próximos passos.';
+const whatsapp = `https://wa.me/5561994624993?text=${encodeURIComponent(message)}`;
+
+document.querySelectorAll('a.wa').forEach((link) => {
+  link.href = whatsapp;
+  link.target = '_blank';
+  link.rel = 'noopener noreferrer';
+});
+
+const menu = document.querySelector('.menu-toggle');
+const navigation = document.querySelector('#navigation');
+
+function closeMenu() {
+  navigation.classList.remove('open');
+  menu.setAttribute('aria-expanded', 'false');
+  document.body.classList.remove('menu-open');
+}
+
+menu.addEventListener('click', () => {
+  const open = menu.getAttribute('aria-expanded') !== 'true';
+  menu.setAttribute('aria-expanded', String(open));
+  navigation.classList.toggle('open', open);
+  document.body.classList.toggle('menu-open', open);
+});
+
+navigation.addEventListener('click', (event) => {
+  if (event.target.closest('a')) closeMenu();
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeMenu();
+});
+
+document.querySelector('#print-link').addEventListener('click', (event) => {
+  event.preventDefault();
+  window.print();
+});
+
+const navLinks = [...navigation.querySelectorAll('a')];
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+    navLinks.forEach((link) => {
+      const active = link.hash === `#${entry.target.id}`;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  });
+}, { rootMargin: '-25% 0px -65% 0px' });
+
+navLinks.forEach((link) => {
+  const section = document.querySelector(link.hash);
+  if (section) observer.observe(section);
+});
